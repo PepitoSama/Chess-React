@@ -1,27 +1,29 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useResizeObserver from '../hooks/useResizeObserver';
 import * as d3 from 'd3';
-import { generateBg, getXScale } from './Game.utils';
+import { generateBg, getXScale, generatePieces } from './Game.utils';
 import styles from './Game.module.css'
+import { Pieces } from '../Pieces'
 
 const Game = ({chess, setChess}) => {
     const svgRef = useRef()
     const svgContainerRef = useRef()
     const dimensions = useResizeObserver(svgContainerRef);
-    const margin = {
-        top: dimensions.height * 0.015,
-        left:  dimensions.width * 0.015,
-        right:  dimensions.width * 0.015,
-        bottom:  dimensions.height * 0.015
-    }
+    const [pieces, setPieces] = useState(new Pieces())
 
     useEffect(() => {
-        if (!dimensions) return;
-        
+        if (!dimensions || !chess) return;
+        const margin = {
+            top: dimensions.height * 0.015,
+            left:  dimensions.width * 0.015,
+            right:  dimensions.width * 0.015,
+            bottom:  dimensions.height * 0.015
+        }
         const svg = d3.select(svgRef.current)
         const xScale = getXScale(dimensions, margin);
-        dimensions && generateBg(svg, xScale);
-    }, [dimensions])
+        generateBg(svg, xScale);
+        generatePieces(svg, xScale, chess.board(), pieces)
+    }, [dimensions, pieces, chess])
 
     return (
         <div ref={svgContainerRef} className={styles.svgContainer}>
