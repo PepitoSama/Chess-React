@@ -71,11 +71,6 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
         setGeneratedBg(false);
     }, [dimensions, moves, nextMove])
 
-    const move = (to) => {
-        chess.move(to);
-        setUpdate(true);
-    }
-
     return (
         <div ref={svgContainerRef} className={styles.svgContainer}>
             <svg width="100%" height="100%" ref={svgRef}></svg>
