@@ -50,8 +50,7 @@ export const generateMoves = (svg, xScale, moves, setNextMove) => {
                 .attr('cx', xScale(x + 0.5))
                 .attr('cy', xScale(y + 0.5))
                 .attr('r', (xScale(1) - xScale(0))/12)
-                .attr('fill', 'blue')
-                .attr('style', (x+y%2)%2 === 0 ? 'filter: drop-shadow(0px 0px 3px black);' :'filter: drop-shadow(0px 0px 3px white);')
+                .attr('fill', (x+y%2)%2 === 0 ? 'black' : 'white')
                 .on('click', () => setNextMove(currentMove))
         }
     }

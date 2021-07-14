@@ -70,13 +70,6 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
         setGeneratedBg(false);
     }, [dimensions, moves, nextMove])
 
-    const randomMove = () => {
-        const moves = chess.moves()
-        const move = moves[Math.floor(Math.random() * moves.length)]
-        chess.move(move)
-        setUpdate(true);
-    }
-
     const move = (to) => {
         chess.move(to);
         setUpdate(true);
@@ -85,7 +78,6 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
     return (
         <div ref={svgContainerRef} className={styles.svgContainer}>
             <svg width="100%" height="100%" ref={svgRef}></svg>
-            <button onClick={() => randomMove()}>test</button>
         </div>
     )
 }
