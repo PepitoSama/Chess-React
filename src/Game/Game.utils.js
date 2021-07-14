@@ -25,7 +25,6 @@ export const getXScale = (dimensions, margin) => {
 }
 
 export const generateMoves = (svg, xScale, moves, setNextMove) => {
-    console.log(moves);
     cleanMoves(svg);
     for(let y = 0; y<8; y++) {
         for(let x = 0; x < 8; x++) {
@@ -62,14 +61,22 @@ export const cleanMoves = (svg) => {
         .remove()
 }
 
+export const cleanPieces = (svg, selector='[class*="piece_"]') => {
+    svg
+        .selectAll(`[class*="piece_"]`)
+        .remove()
+}
+
 export const generatePiecesWhite = (svg, xScale, chess, pieces, setMoves, setNextMove) => {
+    cleanPieces(svg);
     for(let y = 0; y<8; y++) {
         for(let x = 0; x < 8; x++) {
-            svg
-                .selectAll(`.piece_${String.fromCharCode(97 + x)}${8-y}`)
+            const currentPiece = chess.board()[y][x]
+            currentPiece && svg
+                .selectAll(`.piece_${currentPiece.type}${currentPiece.color}_${String.fromCharCode(97 + x)}${8-y}`)
                 .data([null])
                 .join('image')
-                .attr('class', `piece_${String.fromCharCode(97 + x)}${8-y}`)
+                .attr('class', `piece_${currentPiece.type}${currentPiece.color}_${String.fromCharCode(97 + x)}${8-y}`)
                 .attr('x', xScale(x))
                 .attr('y', xScale(y))
                 .attr('width', xScale(1) - xScale(0))
@@ -107,4 +114,31 @@ export const generatePiecesBlack= (svg, xScale, chess, pieces, playAs) => {
                 })
         }
     }
+}
+
+export const movePiece = (svg, xScale, move, chess, setMoves, pieces) => {
+    chess.move(move)
+    const x = move.to.charCodeAt(0) - 97;
+    const y = 8 - move.to.charAt(1);
+    
+    if (move.san.includes('x')) {
+        svg
+            .selectAll(`[class*=${move.to}]`)
+            .remove()
+    }
+
+    svg
+        .selectAll(`.piece_${move.piece}${move.color}_${move.from}`)
+        .on('mousedown', () => {
+            setMoves(chess.moves({ verbose: true, square: move.to }));
+            console.log(move.to, chess.moves({ verbose: true, square: move.to }));
+        })
+        .transition()
+        .attr('class', `piece_${move.san.includes('=Q') ? 'q' : move.piece}${move.color}_${move.to}`)
+        .attr('x', xScale(x))
+        .attr('y', xScale(y))
+        .attr('style', (x+y%2)%2 === 0 ? 'filter: drop-shadow(0px 0px 3px black);' :'filter: drop-shadow(0px 0px 3px white);')
+        .attr("xlink:href", () => pieces.getPiece(chess.board()[y][x]))
+        .duration(400)
+        
 }

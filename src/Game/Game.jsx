@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useResizeObserver from '../hooks/useResizeObserver';
 import * as d3 from 'd3';
-import { generateBg, getXScale, generatePiecesWhite, generatePiecesBlack, generateMoves, cleanMoves } from './Game.utils';
+import { generateBg, getXScale, generatePiecesWhite, generatePiecesBlack, generateMoves, cleanMoves, movePiece } from './Game.utils';
 import styles from './Game.module.css'
 import { Pieces } from '../Pieces'
 
@@ -9,7 +9,7 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
     const svgRef = useRef()
     const svgContainerRef = useRef()
     const dimensions = useResizeObserver(svgContainerRef);
-    const [pieces, setPieces] = useState(new Pieces())
+    const [pieces] = useState(new Pieces())
     const [generatedPieces, setGeneratedPieces] = useState(false);
     const [generatedBg, setGeneratedBg] = useState(false);
     const [update, setUpdate] = useState(true)
@@ -37,8 +37,7 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
 
         // If player requested next move, do it
         if (nextMove) {
-            console.log("next move : ", nextMove)
-            move(nextMove);
+            movePiece(svg, xScale, nextMove, chess, setMoves, pieces);
             setMoves(null);
             setNextMove(null)
         } else {
@@ -46,7 +45,7 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
         }
 
         // Generate all pieces on chess board
-        if(true) {
+        if(!generatedPieces) {
             playAs === "white"
                 ? generatePiecesWhite(svg, xScale, chess, pieces, setMoves)
                 : generatePiecesBlack(svg, xScale, chess, pieces, setMoves)
