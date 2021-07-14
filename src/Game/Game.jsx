@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useResizeObserver from '../hooks/useResizeObserver';
 import * as d3 from 'd3';
-import { generateBg, getXScale, generatePiecesWhite, generatePiecesBlack } from './Game.utils';
+import { generateBg, getXScale, generatePiecesWhite, generatePiecesBlack, generateMoves, cleanMoves } from './Game.utils';
 import styles from './Game.module.css'
 import { Pieces } from '../Pieces'
 
@@ -11,7 +11,10 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
     const dimensions = useResizeObserver(svgContainerRef);
     const [pieces, setPieces] = useState(new Pieces())
     const [generatedPieces, setGeneratedPieces] = useState(false);
+    const [generatedBg, setGeneratedBg] = useState(false);
     const [update, setUpdate] = useState(true)
+    const [moves, setMoves] = useState(null);
+    const [nextMove, setNextMove] = useState(null);
 
     useEffect(() => {
         if (!dimensions || !chess || !update) return;
@@ -25,24 +28,57 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
         const xScale = getXScale(dimensions, margin);
         svg.attr("width", () => xScale(8) - xScale(0) + margin.left + margin.right)
         svg.attr("height", () => xScale(8) - xScale(0) + margin.bottom  + margin.top)
-        generateBg(svg, xScale);
+
+        // Generate board
+        if(!generatedBg) {
+            generateBg(svg, xScale);
+            setGeneratedBg(true);
+        }
+
+        // If player requested next move, do it
+        if (nextMove) {
+            console.log("next move : ", nextMove)
+            move(nextMove);
+            setMoves(null);
+            setNextMove(null)
+        } else {
+            cleanMoves(svg);
+        }
+
+        // Generate all pieces on chess board
         if(true) {
             playAs === "white"
-                ? generatePiecesWhite(svg, xScale, chess, pieces)
-                : generatePiecesBlack(svg, xScale, chess, pieces)
+                ? generatePiecesWhite(svg, xScale, chess, pieces, setMoves)
+                : generatePiecesBlack(svg, xScale, chess, pieces, setMoves)
             setGeneratedPieces(true);
         }
+
+        // If any moves possible, show them
+        moves && generateMoves(svg, xScale, moves, setNextMove);
+
+
+        // If Game Over, return to menu
         if(chess.game_over()) {
             setChess(null);
             setMessage("Game Over !")
         };
         setUpdate(false);
-    }, [dimensions, pieces, chess, update, setChess])
+    })
+
+    useEffect(() => {
+        setUpdate(true);
+        setGeneratedBg(false);
+    }, [dimensions, moves, nextMove])
 
     const randomMove = () => {
         const moves = chess.moves()
         const move = moves[Math.floor(Math.random() * moves.length)]
         chess.move(move)
+        setUpdate(true);
+    }
+
+    const move = (to) => {
+        chess.move(to);
         setUpdate(true);
     }
 
