@@ -15,6 +15,7 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
     const [update, setUpdate] = useState(true)
     const [moves, setMoves] = useState(null);
     const [nextMove, setNextMove] = useState(null);
+    const [toPlay, setToPlay] = useState("white");
 
     useEffect(() => {
         if (!dimensions || !chess || !update) return;
@@ -40,6 +41,7 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
             movePiece(svg, xScale, nextMove, chess, setMoves, pieces);
             setMoves(null);
             setNextMove(null)
+            setToPlay(toPlay === "white" ? "black" : "white")
         } else {
             cleanMoves(svg);
         }
@@ -58,8 +60,8 @@ const Game = ({chess, setChess, playAs="white", setMessage}) => {
 
         // If Game Over, return to menu
         if(chess.game_over()) {
+            setMessage(`${toPlay} won`)
             setChess(null);
-            setMessage("Game Over !")
         };
         setUpdate(false);
     })

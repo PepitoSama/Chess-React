@@ -135,7 +135,7 @@ export const movePiece = (svg, xScale, move, chess, setMoves, pieces) => {
             console.log(move.to, chess.moves({ verbose: true, square: move.to }));
         })
         .transition()
-        .attr('class', `piece_${move.san.includes('=Q') ? 'q' : move.piece}${move.color}_${move.to}`)
+        .attr('class', `piece_${move.san.includes('=') ? move.san.slice(-1).toLowerCase() : move.piece}${move.color}_${move.to}`)
         .attr('x', xScale(x))
         .attr('y', xScale(y))
         .attr('style', (x+y%2)%2 === 0 ? 'filter: drop-shadow(0px 0px 3px black);' :'filter: drop-shadow(0px 0px 3px white);')
