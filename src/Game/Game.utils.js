@@ -129,6 +129,7 @@ export const movePiece = (svg, xScale, move, chess, setMoves, pieces) => {
 
     svg
         .selectAll(`.piece_${move.piece}${move.color}_${move.from}`)
+        .attr("xlink:href", pieces.getPiece(chess.board()[y][x]))
         .on('mousedown', () => {
             setMoves(chess.moves({ verbose: true, square: move.to }));
             console.log(move.to, chess.moves({ verbose: true, square: move.to }));
@@ -138,7 +139,6 @@ export const movePiece = (svg, xScale, move, chess, setMoves, pieces) => {
         .attr('x', xScale(x))
         .attr('y', xScale(y))
         .attr('style', (x+y%2)%2 === 0 ? 'filter: drop-shadow(0px 0px 3px black);' :'filter: drop-shadow(0px 0px 3px white);')
-        .attr("xlink:href", () => pieces.getPiece(chess.board()[y][x]))
         .duration(400)
         
 }
